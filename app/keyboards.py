@@ -52,7 +52,7 @@ riflesN =[
     "Galil AR",
 ]
 
-l1 = "Nothing"
+
 
 
 
@@ -76,24 +76,24 @@ async def all_skins(knife_name: str):           #all knife skins
     keyboard.add(KeyboardButton(text="Main Menu"))
     return keyboard.adjust(2).as_markup()
 
-async def skins_data(knife_skin: str):              #knife link, pics, min and max prices
+async def skins_data(knife_name: str,knife_skin: str):              #knife link, pics, min and max prices
     k = InlineKeyboardBuilder()
     links = df.loc[
-        (df.iloc[:, 0] == l1) & (df.iloc[:, 1] == knife_skin),
+        (df.iloc[:, 0] == knife_name) & (df.iloc[:, 1] == knife_skin),
         df.columns[3]
     ]
     
     pics = df.loc[
-        (df.iloc[:, 0] == l1) & (df.iloc[:, 1] == knife_skin),
+        (df.iloc[:, 0] == knife_name) & (df.iloc[:, 1] == knife_skin),
         df.columns[2]
     ]
     min_prices = df.loc[
-        (df.iloc[:,0] == l1) & (df.iloc[:, 1] == knife_skin),
+        (df.iloc[:,0] == knife_name) & (df.iloc[:, 1] == knife_skin),
         df.columns[4]
     ]
     
     max_prices = df.loc[
-        (df.iloc[:,0] == l1) & (df.iloc[:, 1] == knife_skin),
+        (df.iloc[:,0] == knife_name) & (df.iloc[:, 1] == knife_skin),
         df.columns[5]
     ]
     
@@ -134,24 +134,24 @@ async def all_rifle_skins(rifle_name: str):           #all knife skins
     return keyboard.adjust(2).as_markup()
 
 
-async def rifle_skins_data(rifle_skin: str):              #rifle link, pics, min and max prices
+async def rifle_skins_data(rifle_name: str,rifle_skin: str):              #rifle link, pics, min and max prices
     k = InlineKeyboardBuilder()
     links = df_rifles.loc[
-        (df_rifles.iloc[:, 0] == l1) & (df_rifles.iloc[:, 1] == rifle_skin),
+        (df_rifles.iloc[:, 0] == rifle_name) & (df_rifles.iloc[:, 1] == rifle_skin),
         df_rifles.columns[3]
     ]
     
     pics = df_rifles.loc[
-        (df_rifles.iloc[:, 0] == l1) & (df_rifles.iloc[:, 1] == rifle_skin),
+        (df_rifles.iloc[:, 0] == rifle_name) & (df_rifles.iloc[:, 1] == rifle_skin),
         df_rifles.columns[2]
     ]
     min_prices = df_rifles.loc[
-        (df_rifles.iloc[:,0] == l1) & (df_rifles.iloc[:, 1] == rifle_skin),
+        (df_rifles.iloc[:,0] == rifle_name) & (df_rifles.iloc[:, 1] == rifle_skin),
         df_rifles.columns[4]
     ]
     
     max_prices = df_rifles.loc[
-        (df_rifles.iloc[:,0] == l1) & (df_rifles.iloc[:, 1] == rifle_skin),
+        (df_rifles.iloc[:,0] == rifle_name) & (df_rifles.iloc[:, 1] == rifle_skin),
         df_rifles.columns[5]
     ]
     
