@@ -4,16 +4,19 @@ import pandas as pd
 import re
 import numpy as np
 
-df = pd.read_csv("databases\knives.csv")
+df = pd.read_csv("databases\Knives.csv")                    #df module
 df_rifles = pd.read_csv("databases\Rifles.csv")
+df_gloves = pd.read_csv("databases\Gloves.csv")
+
 skin_row = list(df.iloc[:, 1])
 skin_rifles_row = list(df_rifles.iloc[:, 1])
+skin_gloves_row = list(df_gloves.iloc[:, 1])
 
 
 main = ReplyKeyboardMarkup(
     keyboard=[
         [KeyboardButton(text="Knifes")],
-        # [KeyboardButton(text='Gloves')],
+        [KeyboardButton(text='Gloves')],
         [KeyboardButton(text='Rifles')], 
         #KeyboardButton(text='Pistols')],
         # [KeyboardButton(text='Shotguns'), KeyboardButton(text='SMG')],
@@ -50,6 +53,17 @@ riflesN =[
     "SG 553",
     "FAMAS",
     "Galil AR",
+]
+
+glovesN = [
+    "Bloodhound Gloves",
+    "Broken Fang Gloves",
+    "Driver Gloves",
+    "Hand Wraps",
+    "Hydra Gloves",
+    "Moto Gloves",
+    "Specialist Gloves",
+    "Sport Gloves"
 ]
 
 
@@ -170,9 +184,64 @@ async def rifle_skins_data(rifle_name: str,rifle_skin: str):              #rifle
         
 
 
-   
+#----------------------------------------------------------------------------------------------------------------
+
+async def all_gloves():             #all gloves types
+    keyboard = ReplyKeyboardBuilder()
+
+    for glove in glovesN:
+        keyboard.add(KeyboardButton(text=glove))
+
+    keyboard.add(KeyboardButton(text="Main Menu"))
+    return keyboard.adjust(2).as_markup() 
+
+
+async def all_gloves_skins(glove_name: str):           #all gloves skins
+    keyboard = ReplyKeyboardBuilder()
     
- 
+    skins = df_gloves.loc[df_gloves.iloc[:, 0] == glove_name, df_gloves.columns[1]]
+    
+    for skin in skins:
+        keyboard.add(KeyboardButton(text=str(skin)))
+        
+    keyboard.add(KeyboardButton(text="Main Menu"))
+    return keyboard.adjust(2).as_markup()
+    
+
+
+async def glove_skins_data(glove_name: str,glove_skin: str):              #glove link, pics, min and max prices
+    k = InlineKeyboardBuilder()
+    links = df_gloves.loc[
+        (df_gloves.iloc[:, 0] == glove_name) & (df_gloves.iloc[:, 1] == glove_skin),
+        df_gloves.columns[3]
+    ]
+    
+    pics = df_gloves.loc[
+        (df_gloves.iloc[:, 0] == glove_name) & (df_gloves.iloc[:, 1] == glove_skin),
+        df_gloves.columns[2]
+    ]
+    min_prices = df_gloves.loc[
+        (df_gloves.iloc[:,0] == glove_name) & (df_gloves.iloc[:, 1] == glove_skin),
+        df_gloves.columns[4]
+    ]
+    
+    max_prices = df_gloves.loc[
+        (df_gloves.iloc[:,0] == glove_name) & (df_gloves.iloc[:, 1] == glove_skin),
+        df_gloves.columns[5]
+    ]
+    
+    
+    pic_url = pics.iloc[0] if not pics.empty else None
+    min_price = min_prices.iloc[0] if not min_prices.empty else None
+    max_price = max_prices.iloc[0] if not max_prices.empty else None
+    
+    for link in links:
+        k.button(text="All current prices", url=str(link))
+    
+    keyboard = k.adjust(1).as_markup()
+    
+    
+    return keyboard, pic_url, min_price, max_price 
 
 
     

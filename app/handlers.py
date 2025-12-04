@@ -8,9 +8,11 @@ from aiogram.fsm.context import FSMContext
 import app.keyboards as kb
 from app.keyboards import knifesN
 from app.keyboards import riflesN
+from app.keyboards import glovesN
 
 from app.keyboards import skin_row
 from app.keyboards import skin_rifles_row
+from app.keyboards import skin_gloves_row
 
 router = Router()
 
@@ -112,6 +114,55 @@ async def rifle_data_skins(message: Message, state: FSMContext):
             
         await message.answer(
             text= f"More info for {rifle_name} - {rifle_skin}", reply_markup= keyboard
+        )
+        await state.update_data(unitSkin= None)
+        
+        
+        
+
+@router.message(F.text == "Main Menu")
+async def return_menu(message: Message, state: FSMContext):
+    await message.answer(text="Main", reply_markup=kb.main)
+    await state.clear()
+
+#----------------------------------------------------------------------------------------------------------------------
+
+
+@router.message(F.text == "Gloves")         #all gloves types
+async def rifles(message: Message, state: FSMContext):
+    await state.clear()
+    await state.set_state(Skins_Reg.unitName)
+    await message.answer(text="Gloves: ", reply_markup=await kb.all_gloves())
+
+
+@router.message(F.text.in_(glovesN),  Skins_Reg.unitName)            #all gloves skins
+async def gloves_rifles(message: Message, state: FSMContext):
+    await state.update_data(unitName=message.text)
+    await state.set_state(Skins_Reg.unitSkin)
+    text = message.text.strip()
+    if text in glovesN:
+        await message.answer(
+            text=f"Skins for the: {text}", reply_markup=await kb.all_gloves_skins(text)
+        )
+
+@router.message(F.text.in_(skin_gloves_row), Skins_Reg.unitSkin)                #skins gloves data
+async def glove_data_skins(message: Message, state: FSMContext):
+    await state.update_data(unitSkin=message.text)
+    data = await state.get_data()
+    text = message.text.strip()
+    glove_name = data.get("unitName")
+    glove_skin = data.get("unitSkin")
+    
+    if text in skin_gloves_row:
+        keyboard, image_url, min_p, max_p = await kb.glove_skins_data(glove_name, glove_skin)
+        if image_url:
+            await message.answer_photo(
+                photo= image_url,
+                caption=f"🎯 {glove_name} | {glove_skin}\n💰 Current prices for this item: {min_p} -- {max_p}.\n"   
+        )
+            
+        await message.answer(
+            text= f"More info for {glove_name} - {glove_skin}", reply_markup= keyboard
         )
         await state.update_data(unitSkin= None)
         
