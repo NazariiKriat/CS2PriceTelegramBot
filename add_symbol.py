@@ -1,6 +1,6 @@
 import pandas as pd
 
-
+                                                      #WE need this code because parser sometimes makes invisiable errors and it solves by adding 1 more symbol 
 df = pd.read_csv('databases\LMG.csv')
 
 

@@ -1,6 +1,6 @@
 import pandas as pd
 
-
+                                                       #Sometimes Webscrapper script is making dublicates of items and this script delates them
 df = pd.read_csv('LMG.csv')
 
 
