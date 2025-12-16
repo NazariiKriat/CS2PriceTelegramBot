@@ -97,6 +97,8 @@ In the future, it can be:
 ```text
 ├── run.py
 ├── config.py
+├── rem_dub.py
+├── add_symbol.py
 ├── app/
 │   ├── handlers.py
 │   └── keyboards.py
