@@ -1,7 +1,9 @@
 import pandas as pd
 
                                                        #Sometimes Webscrapper script is making dublicates of items and this script delates them
-df = pd.read_csv('LMG.csv')
+
+
+df = pd.read_csv('LMG.csv')         #csv file where you need to remove dublicates
 
 
 print(f"Original shape: {df.shape}")
