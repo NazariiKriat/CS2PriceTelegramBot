@@ -5,8 +5,9 @@ To start this Telegram bot you need to complete a few steps such as:
 1. Install all the Python libraries:
 
    ```bash
-   pip install aiogram pandas beautifulsoup4
+   pip install aiogram pandas beautifulsoup4 
    ```
+   also install msedge_driver for Sellenium
 
 2. Get your own bot token through **BotFather** in Telegram and insert it into the `TOKEN` variable in the `config.py` file
 
@@ -20,9 +21,7 @@ To start this Telegram bot you need to complete a few steps such as:
 
 ## 🌐 Using Web Scrapers
 
-If you want to use **web scrapers**, they will generate new CSV files containing all skins and related data. However, sometimes duplicate entries may appear.
-
-In that case, you need to use `rem_dub.py`. This script removes all duplicates from the CSV files and recreates them as new files.
+Now we have one master_scrapper that works async. You just to start bot and he will work automatically 
 
 **VERY IMPORTANT:** the names of the recreated CSV files must be exactly the same as the original ones.
 
