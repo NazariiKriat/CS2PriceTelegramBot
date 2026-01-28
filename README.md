@@ -8,7 +8,7 @@ Instead of manually browsing multiple websites, users can simply search for a sk
 
 * 🖼️ Weapon skin image
 * 🔗 Link to buy the skin
-* 💰 Minimum and maximum current prices
+* 💰 Minimum and maximum current prices that updates every 2 minutes
 
 This makes checking CS2 skin prices **fast, convenient, and user-friendly**.
 
@@ -19,7 +19,7 @@ This makes checking CS2 skin prices **fast, convenient, and user-friendly**.
 * 🔍 Fast search for CS2 weapon skins
 * 🖼️ Displays weapon skin images
 * 🔗 Provides direct purchase links
-* 💰 Shows minimum and maximum prices
+* 💰 Shows minimum and maximum prices in real time
 * ⚡ Fully asynchronous for high performance
 * 📱 Works directly inside Telegram
 
@@ -32,6 +32,7 @@ This makes checking CS2 skin prices **fast, convenient, and user-friendly**.
 * **Asyncio** (Asynchronous programming)
 * **Pandas** (Data processing)
 * **Beautiful Soup** (Web scraping)
+* Sillenium
 * **CSV database** (Data storage)
 
 ---
@@ -111,14 +112,8 @@ In the future, it can be:
 │   ├── Snipers.csv
 │   └── LMG.csv
 ├── webscrapers/
-│   ├── webscraper.py
-│   ├── webscraper_knives.py
-│   ├── webscraper_gloves.py
-│   ├── webscraper_pistols.py
-│   ├── webscraper_rifles.py
-│   ├── webscraper_smgs.py
-│   ├── webscraper_snipers.py
-│   └── webscraper_lmgs.py
+│   ├── webscraper_master.py
+│   
 ├── venv/
 ├── requirements.txt
 └── README.md
