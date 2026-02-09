@@ -21,127 +21,127 @@ WEAPONS = {
 }
 
 
+def run_parser():
+    conn = sqlite3.connect("main.db")
+    cursor = conn.cursor()
 
-conn = sqlite3.connect("main.db")
-cursor = conn.cursor()
+    cursor.executescript("""
+    CREATE TABLE IF NOT EXISTS categories (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT UNIQUE
+    );
 
-cursor.executescript("""
-CREATE TABLE IF NOT EXISTS categories (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name TEXT UNIQUE
-);
+    CREATE TABLE IF NOT EXISTS guns (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT,
+        category_id INTEGER,
+        UNIQUE(name, category_id),
+        FOREIGN KEY (category_id) REFERENCES categories(id)
+    );
 
-CREATE TABLE IF NOT EXISTS guns (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name TEXT,
-    category_id INTEGER,
-    UNIQUE(name, category_id),
-    FOREIGN KEY (category_id) REFERENCES categories(id)
-);
+    CREATE TABLE IF NOT EXISTS skins (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        gun_id INTEGER,
+        skin TEXT,
+        image TEXT,
+        price_link TEXT,
+        min_price REAL,
+        max_price REAL,
+        FOREIGN KEY (gun_id) REFERENCES guns(id)
+    );
+    """)
 
-CREATE TABLE IF NOT EXISTS skins (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    gun_id INTEGER,
-    skin TEXT,
-    image TEXT,
-    price_link TEXT,
-    min_price REAL,
-    max_price REAL,
-    FOREIGN KEY (gun_id) REFERENCES guns(id)
-);
-""")
-
-conn.commit()
-
-
-def get_or_create_category(name):
-    cursor.execute("INSERT OR IGNORE INTO categories (name) VALUES (?)", (name,))
     conn.commit()
-    cursor.execute("SELECT id FROM categories WHERE name = ?", (name,))
-    return cursor.fetchone()[0]
-
-def get_or_create_gun(name, category_id):
-    cursor.execute(
-        "INSERT OR IGNORE INTO guns (name, category_id) VALUES (?, ?)",
-        (name, category_id)
-    )
-    conn.commit()
-    cursor.execute(
-        "SELECT id FROM guns WHERE name = ? AND category_id = ?",
-        (name, category_id)
-    )
-    return cursor.fetchone()[0]
-
-def parse_price(text):
-    return float(text.replace("$", "").strip())
 
 
-options = Options()
-options.add_argument("--disable-blink-features=AutomationControlled")
-options.add_argument("--start-maximized")
+    def get_or_create_category(name):
+        cursor.execute("INSERT OR IGNORE INTO categories (name) VALUES (?)", (name,))
+        conn.commit()
+        cursor.execute("SELECT id FROM categories WHERE name = ?", (name,))
+        return cursor.fetchone()[0]
 
-driver_path = r"C:\Users\nazar\Desktop\Programming\TgBot\msedge_driver\msedgedriver.exe"
-driver = webdriver.Edge(service=Service(driver_path), options=options)
+    def get_or_create_gun(name, category_id):
+        cursor.execute(
+            "INSERT OR IGNORE INTO guns (name, category_id) VALUES (?, ?)",
+            (name, category_id)
+        )
+        conn.commit()
+        cursor.execute(
+            "SELECT id FROM guns WHERE name = ? AND category_id = ?",
+            (name, category_id)
+        )
+        return cursor.fetchone()[0]
 
-for category_name, data in WEAPONS.items():
-    print(f"\n=== CATEGORY: {category_name} ===")
-    category_id = get_or_create_category(category_name)
+    def parse_price(text):
+        return float(text.replace("$", "").strip())
 
-    driver.get(data["link"])
 
-    WebDriverWait(driver, 10).until(
-        EC.presence_of_element_located((By.CSS_SELECTOR, "span.block.text-gray-400"))
-    )
+    options = Options()
+    options.add_argument("--disable-blink-features=AutomationControlled")
+    options.add_argument("--start-maximized")
 
-    soup = BeautifulSoup(driver.page_source, "html.parser")
+    driver_path = r"C:\Users\nazar\Desktop\Programming\TgBot\msedge_driver\msedgedriver.exe"
+    driver = webdriver.Edge(service=Service(driver_path), options=options)
 
-    pages = soup.find_all("a", class_="flex items-center px-4 py-2 text-sm font-medium")
-    pages_found = [p.get("href") for p in pages if p.get("href")]
-    pages_found.insert(0, data["link"])
+    for category_name, data in WEAPONS.items():
+        print(f"\n=== CATEGORY: {category_name} ===")
+        category_id = get_or_create_category(category_name)
 
-    for url in pages_found:
-        driver.get(url)
-        time.sleep(0.5)
+        driver.get(data["link"])
+
+        WebDriverWait(driver, 10).until(
+            EC.presence_of_element_located((By.CSS_SELECTOR, "span.block.text-gray-400"))
+        )
 
         soup = BeautifulSoup(driver.page_source, "html.parser")
 
-        guns = soup.find_all("span", class_="block text-gray-400 text-sm truncate")
-        skins = soup.find_all("span", class_="block text-lg leading-7 truncate")
-        imgs = soup.find_all("img", class_="mx-auto max-h-[237px]")
-        links = soup.find_all("a", class_="absolute left-0 right-0 bottom-0 rounded-b-sm")
-        prices = soup.find_all("div", class_="left-4 right-4 text-center text-lg absolute")
+        pages = soup.find_all("a", class_="flex items-center px-4 py-2 text-sm font-medium")
+        pages_found = [p.get("href") for p in pages if p.get("href")]
+        pages_found.insert(0, data["link"])
 
-        min_list, max_list = [], []
-        for p in prices:
-            a = p.find_all("a")
-            if len(a) == 2:
-                min_list.append(a[0])
-                max_list.append(a[1])
+        for url in pages_found:
+            driver.get(url)
+            time.sleep(0.5)
 
-        for gun, skin, img, link, min_p, max_p in zip(
-            guns, skins, imgs, links, min_list, max_list
-        ):
-            gun_name = gun.text.strip()
-            gun_id = get_or_create_gun(gun_name, category_id)
+            soup = BeautifulSoup(driver.page_source, "html.parser")
 
-            cursor.execute("""
-                INSERT INTO skins (
-                    gun_id, skin, image, price_link, min_price, max_price
-                ) VALUES (?, ?, ?, ?, ?, ?)
-            """, (
-                gun_id,
-                skin.text.strip(),
-                img.get("src"),
-                link.get("href"),
-                parse_price(min_p.text),
-                parse_price(max_p.text),
-            ))
+            guns = soup.find_all("span", class_="block text-gray-400 text-sm truncate")
+            skins = soup.find_all("span", class_="block text-lg leading-7 truncate")
+            imgs = soup.find_all("img", class_="mx-auto max-h-[237px]")
+            links = soup.find_all("a", class_="absolute left-0 right-0 bottom-0 rounded-b-sm")
+            prices = soup.find_all("div", class_="left-4 right-4 text-center text-lg absolute")
 
-        conn.commit()
-        print("✔ Page done:", url)
+            min_list, max_list = [], []
+            for p in prices:
+                a = p.find_all("a")
+                if len(a) == 2:
+                    min_list.append(a[0])
+                    max_list.append(a[1])
 
-    time.sleep(random.uniform(1, 3))
+            for gun, skin, img, link, min_p, max_p in zip(
+                guns, skins, imgs, links, min_list, max_list
+            ):
+                gun_name = gun.text.strip()
+                gun_id = get_or_create_gun(gun_name, category_id)
 
-driver.quit()
-conn.close()
-print("✅ All data saved into SQLite")
+                cursor.execute("""
+                    INSERT INTO skins (
+                        gun_id, skin, image, price_link, min_price, max_price
+                    ) VALUES (?, ?, ?, ?, ?, ?)
+                """, (
+                    gun_id,
+                    skin.text.strip(),
+                    img.get("src"),
+                    link.get("href"),
+                    parse_price(min_p.text),
+                    parse_price(max_p.text),
+                ))
+
+            conn.commit()
+            print("✔ Page done:", url)
+
+        time.sleep(random.uniform(1, 3))
+
+    driver.quit()
+    conn.close()
+    print("✅ All data saved into SQLite")
