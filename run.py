@@ -4,6 +4,8 @@ from app.handlers import router
 from config import TOKEN
 import logging
 from webscrappers.webscrapper_master import run_parser
+#from webscrappers.webscrapper_master_sql import run_parser             for sql
+
 
 
 bot = Bot(token=TOKEN)
